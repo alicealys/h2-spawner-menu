@@ -2,24 +2,61 @@ local json = require("json")
 local menus = {}
 
 local spawnlocation = "crosshair"
+local targetteam = "auto"
 
 function spawnlocationoptions(menu)
-    game:setdvar("ai_spawner_dummy_var", spawnlocation)
+    game:setdvar("ai_spawner_location", spawnlocation)
+    game:setdvar("ai_spawner_team", targetteam)
 
-    local options = {
+    LUI.Options.CreateOptionButton(menu, 
+        "ai_spawner_location", 
+        "Spawn location", 
+        "Where to spawn the AI", 
         {
-            value = "crosshair",
-            text = "Crosshair"
-        },
-        {
-            value = "player",
-            text = "Player location"
-        }
-    }
+            {
+                value = "crosshair",
+                text = "Crosshair"
+            },
+            {
+                value = "player",
+                text = "Player location"
+            }
+        }, 
+        nil, nil, function(value)
+            spawnlocation = value
+        end
+    )
 
-    LUI.Options.CreateOptionButton(menu, "ai_spawner_dummy_var", "Spawn location", "Where to spawn the AI", options, nil, nil, function(value)
-        spawnlocation = value
-    end)
+    LUI.Options.CreateOptionButton(menu, 
+        "ai_spawner_team", 
+        "Target AI team", 
+        "Team to assign to the AI", 
+        {
+            {
+                value = "auto",
+                text = "Auto"
+            },
+            {
+                value = "axis",
+                text = "Axis"
+            },
+            {
+                value = "allies",
+                text = "Allies"
+            },
+            {
+                value = "team3",
+                text = "Team3"
+            },
+            {
+                value = "neutral",
+                text = "Neutral"
+            }
+        }, 
+        nil, nil, function(value)
+            targetteam = value
+        end
+    )
 end
 
 function backbutton(menu)
@@ -113,7 +150,7 @@ function createmenu(team)
         if (spawners[team]) then
             for k, v in pairs(spawners[team]) do
                 menu:AddButton(v.name, function()
-                    notify("select_ai_spawner", v.num, spawnlocation)
+                    notify("select_ai_spawner", v.num, spawnlocation, targetteam)
                 end, nil, true, nil, {
                     desc_text = "Spawn this AI type"
                 })

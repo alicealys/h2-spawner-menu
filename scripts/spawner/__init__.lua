@@ -158,13 +158,14 @@ player:onnotify("select_vehicle_spawner", function(spawner, location)
     end
 end)
 
-player:onnotify("select_ai_spawner", function(spawner, location)
+player:onnotify("select_ai_spawner", function(spawner, location, team)
     local aiorigin = player.origin
     local aicount = game:getdvarint("ai_count")
     local total = game:getaiarray()
 
     if (#total >= aicount) then
         game:iprintln("AI limit reached")
+        return
     end
 
     if (location == "crosshair") then
@@ -176,11 +177,15 @@ player:onnotify("select_ai_spawner", function(spawner, location)
         local origin = spawner.origin
         spawner.origin = aiorigin
         spawner.count = spawner.count + 1
-        local vehicle = spawner:stalingradspawn()
+
+        local ai = spawner:stalingradspawn()
+        if (team ~= "auto") then
+            ai.team = team
+        end
+
         spawner.origin = origin
     end
 end)
-
 
 player:onnotify("select_weapon_spawner", function(weapon, action, location)
     if (action == "give") then
