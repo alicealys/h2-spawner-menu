@@ -12,3 +12,23 @@ Supports:
 * Launch a mission and press **F5** to open the menu
 
 ## Showcase
+
+| <img src="assets/github/main.png?raw=true" /> |
+|:-:|
+| Main menu |
+
+| <img src="assets/github/vehicle.png?raw=true" /> |
+|:-:|
+| Vehicle spawner |
+
+| <img src="assets/github/ai.png?raw=true" /> |
+|:-:|
+| AI spawner |
+
+| <img src="assets/github/axis_ai.png?raw=true" /> |
+|:-:|
+| Axis AI spawner |
+
+| <img src="assets/github/weapon.png?raw=true" /> |
+|:-:|
+| Weapon spawner |
