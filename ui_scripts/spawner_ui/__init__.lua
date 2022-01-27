@@ -17,6 +17,8 @@ function notify(...)
     player:notify(table.unpack(args))
 end
 
+lastaction = nil
+
 function createdivider(menu, text)
 	local element = LUI.UIElement.new( {
 		leftAnchor = true,
@@ -111,11 +113,11 @@ end
 
 -- X
 keybinds[120] = function()
-    if (not lastnotify) then
+    if (not lastaction) then
         return
     end
 
-    player:notify(table.unpack(lastnotify))
+    lastaction()
 end
 
 game:onnotify("keydown", function(key)

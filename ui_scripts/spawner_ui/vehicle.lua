@@ -43,7 +43,10 @@ function mainmenu(a1)
     end)
 
     menu:AddButton("Delete all vehicles", function()
-        notify("delete_vehicles")
+        lastaction = function()
+            notify("delete_vehicles")
+        end
+        lastaction()
     end, nil, true, nil, {
         desc_text = "Delete all the vehicles in the map"
     })
@@ -52,7 +55,10 @@ function mainmenu(a1)
 
     for k, v in pairs(spawners) do
         menu:AddButton(v.name, function()
-            notify("select_vehicle_spawner", v.num, spawnlocation)
+            lastaction = function()
+                notify("select_vehicle_spawner", v.num, spawnlocation)
+            end
+            lastaction()
         end, nil, true, nil, {
             desc_text = "Spawn this vehicle type"
         })

@@ -61,7 +61,10 @@ function mainmenu(a1)
     )
 
     menu:AddButton("Delete all weapons", function()
-        notify("delete_weapons")
+        lastaction = function()
+            notify("delete_weapons")
+        end
+        lastaction()
     end, nil, true, nil, {
         desc_text = "Delete all the weapons in the map"
     })
@@ -74,7 +77,10 @@ function mainmenu(a1)
         local displayname = game:getweapondisplayname(weapons[i])
         if (displayname ~= "") then
             menu:AddButton(displayname, function()
-                notify("select_weapon_spawner", weapons[i], action, spawnlocation)
+                lastaction = function()
+                    notify("select_weapon_spawner", weapons[i], action, spawnlocation)
+                end
+                lastaction()
             end, nil, true, nil, {
                 desc_text = "Spawn this weapon"
             })

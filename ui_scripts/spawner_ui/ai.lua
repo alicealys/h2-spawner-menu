@@ -74,7 +74,10 @@ end
 
 function deleteaibutton(menu)
     menu:AddButton("Delete AI", function()
-        notify("delete_ai")
+        lastaction = function()
+            notify("delete_ai")
+        end
+        lastaction()
     end, nil, true, nil, {
         desc_text = "Delete all AI"
     })
@@ -150,7 +153,10 @@ function createmenu(team)
         if (spawners[team]) then
             for k, v in pairs(spawners[team]) do
                 menu:AddButton(v.name, function()
-                    notify("select_ai_spawner", v.num, spawnlocation, targetteam)
+                    lastaction = function()
+                        notify("select_ai_spawner", v.num, spawnlocation, targetteam)
+                    end
+                    lastaction()
                 end, nil, true, nil, {
                     desc_text = "Spawn this AI type"
                 })
