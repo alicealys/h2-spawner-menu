@@ -13,7 +13,9 @@ Keybinds:
 
 # How
 * Install [h2-mod](https://github.com/fedddddd/h2-mod#download)
-* [Download](https://github.com/fedddddd/h2-spawner-menu/releases) & copy the `scripts` and `ui_scripts` folders your **Call of Duty Modern Warfare 2 Campaign Remastered** folder
+* If it doesn't exist create a `mods` folder in your **Call of Duty Modern Warfare 2 Campaign Remastered** folder
+* Copy the `spawner` folder from [here](https://github.com/fedddddd/h2-spawner-menu/releases) into the `mods` folder
+* Launch the game and press on the **MODS** button and load `mods/spawner`
 * Launch a mission and press **F5** to open the menu
 
 ## Showcase
