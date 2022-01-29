@@ -1,3 +1,0 @@
-Entity spawner menu that supports Vehicles, AI and Weapons!
-Author: fed
-Version: 1.0.0
