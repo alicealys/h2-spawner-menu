@@ -73,9 +73,11 @@ function mainmenu(a1)
 
     local weapons = game:assetlist("weapon")
 
-    for i = 1, #weapons do
+    local addedweapons = {}
+    for i = 1, math.min(64, #weapons) do
         local displayname = game:getweapondisplayname(weapons[i])
-        if (displayname ~= "") then
+        if (displayname ~= "" and not addedweapons[displayname]) then
+            addedweapons[displayname] = true
             menu:AddButton(displayname, function()
                 lastaction = function()
                     notify("select_weapon_spawner", weapons[i], action, spawnlocation)
