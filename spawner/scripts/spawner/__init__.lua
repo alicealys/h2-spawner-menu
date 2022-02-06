@@ -28,11 +28,23 @@ end, 0)--]]
 --     vehicle:makeusable()
 -- end)
 
--- Don't delete spawners
-game:detour("_ID43797", "_ID44261", function() end)
+print(pcall(function()
+    -- Don't delete spawners    
+    game:detour("_ID43797", "_ID44261", function() end)
+end))
 
 -- Change max ai count
 game:setdvar("ai_count", 64)
+
+-- maps/spawner::spawn_think
+local spawnthinkhook = nil
+spawnthinkhook = game:detour("_ID42372", "_ID35176", function(guy, targetname)
+    if (targetname == "custom_ai") then
+        return
+    end
+
+    spawnthinkhook.invoke(guy, targetname)
+end)
 
 function string:split()
     local t = {}
@@ -129,6 +141,95 @@ function getlookat()
     return trace
 end
 
+function entity:followplayer()
+    local interval = game:oninterval(function()
+        self:setgoalpos(getlookat())
+    end, 0)
+
+    self:onnotifyonce("death", function()
+        interval:clear()
+    end)
+end
+
+local lookatent = game:spawn("script_origin", vector:new(0, 0, 0))
+game:oninterval(function()
+    lookatent.origin = getlookat()
+end, 0)
+
+function setdvarifuninitialized(dvar, value)
+    if (game:getdvar(dvar) == "") then
+        game:setdvar(dvar, value)
+    end
+end
+
+setdvarifuninitialized("ai_controller_follow", "player")
+setdvarifuninitialized("ai_controller_shoot", "none")
+
+function entity:getclosestenemy()
+    if (self.team == "neutral") then
+        return nil
+    end
+
+    local ai = game:getaispeciesarray((self.team == "axis" or self.team == "team3") and "allies" or "axis")
+    local validai = {}
+    for i = 1, #ai do
+        if (ai[i].health > 0 and game:isalive(ai[i]) == 1 and self:cansee(ai[i]) == 1) then
+            table.insert(validai, ai[i])
+        end
+    end
+
+    table.sort(validai, function(a, b)
+        return game:distance(self.origin, b.origin) > game:distance(self.origin, a.origin)
+    end)
+
+    return validai[1]
+end
+
+function entity:controller()
+    self:clearentitytarget()
+    self:cleargoalvolume()
+    
+    local interval = game:oninterval(function()
+        local follow = game:getdvar("ai_controller_follow")
+        local shoot = game:getdvar("ai_controller_shoot")
+
+        if (follow == "player") then
+            self:setgoalentity(player)
+        elseif (follow == "lookat") then
+            self:setgoalentity(lookatent)
+        elseif (follow == "none") then
+            self:setgoalentity(self)
+        end
+
+        if (shoot == "lookat") then
+            self:setentitytarget(lookatent)
+        elseif (shoot == "enemies") then
+            local enemy = self:getclosestenemy()
+            if (enemy) then
+                self:shoot()
+                self:setentitytarget(enemy)
+            else
+                self:clearentitytarget()
+            end
+        else
+            self:clearentitytarget()
+        end
+    end, 0)
+
+    self:onnotifyonce("death", function()
+        interval:clear()
+    end)
+end
+
+game:ontimeout(function()
+    local ai = game:getaiarray()
+    for i = 1, #ai do
+        if (ai[i].targetname == "custom_ai") then
+            ai[i]:controller()
+        end
+    end
+end, 0)
+
 function getplayervehicle()
     local linked = player:getlinkedparent()
     if (linked and linked.classname and linked.classname:match("vehicle")) then
@@ -175,15 +276,32 @@ player:onnotify("select_ai_spawner", function(spawner, location, team)
     local spawner = game:getentbynum(spawner)
     if (game:isspawner(spawner) == 1) then
         local origin = spawner.origin
+        local targetname = spawner.targetname
+
         spawner.origin = aiorigin
         spawner.count = spawner.count + 1
+        spawner.targetname = "custom_ai"
+
+        game:ontimeout(function()
+            spawner.origin = origin
+            spawner.targetname = targetname
+        end, 0)
 
         local ai = spawner:stalingradspawn()
+        ai.baseaccuracy = 1000
+        ai.maxhealth = 1000
+        ai.health = 1000
+
+        if (not ai) then
+            game:iprintln("Failed to spawn AI")
+            return
+        end
+
+        ai:controller()
+
         if (team ~= "auto") then
             ai.team = team
         end
-
-        spawner.origin = origin
     end
 end)
 
@@ -224,6 +342,20 @@ player:onnotify("delete_ai", function()
     for i = 1, #ai do
         ai[i]:delete()
     end
+end)
+
+player:onnotify("delete_custom_ai", function()
+    local ai = game:getaiarray()
+    local count = 0
+
+    for i = 1, #ai do
+        if (ai[i].targetname == "custom_ai") then
+            ai[i]:delete()
+            count = count + 1
+        end
+    end
+
+    game:iprintln("^2" .. count .. "^7 ai deleted")
 end)
 
 player:onnotify("delete_vehicles", function()

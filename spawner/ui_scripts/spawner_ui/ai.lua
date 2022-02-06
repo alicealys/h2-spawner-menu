@@ -81,6 +81,23 @@ function deleteaibutton(menu)
     end, nil, true, nil, {
         desc_text = "Delete all AI"
     })
+
+    menu:AddButton("Delete Custom AI", function()
+        lastaction = function()
+            notify("delete_custom_ai")
+        end
+        lastaction()
+    end, nil, true, nil, {
+        desc_text = "Delete custom AI"
+    })
+end
+
+function controllerbutton(menu)
+    menu:AddButton("Controller", function()
+        openmenu("ai_spawner_controller_menu")
+    end, nil, true, nil, {
+        desc_text = "Edit AI controller settings"
+    })
 end
 
 function mainmenu(a1)
@@ -101,6 +118,7 @@ function mainmenu(a1)
 
     spawnlocationoptions(menu)
     deleteaibutton(menu)
+    controllerbutton(menu)
 
     createdivider(menu, "Teams")
 
@@ -137,6 +155,7 @@ function createmenu(team)
 
         spawnlocationoptions(menu)
         deleteaibutton(menu)
+        controllerbutton(menu)
     
         createdivider(menu, "Spawner types")
 
@@ -184,4 +203,73 @@ createmenu("allies")
 createmenu("team3")
 createmenu("neutral")
 
+function controllermenu(a1)
+    local InitInGameBkg = LUI.MenuTemplate.InitInGameBkg
+    LUI.MenuTemplate.InitInGameBkg = function() end
+
+    local menu = LUI.MenuTemplate.new(a1, {
+        menu_title = "AI Controller",
+        exclusiveController = 0,
+        menu_width = 400,
+        menu_top_indent = LUI.MenuTemplate.spMenuOffset,
+        showTopRightSmallBar = true
+    })
+
+    LUI.MenuTemplate.InitInGameBkg = InitInGameBkg
+
+    LUI.Options.CreateOptionButton(menu, 
+        "ai_controller_follow", 
+        "Follow", 
+        "What to follow.", 
+        {
+            {
+                value = "auto",
+                text = "Automatic"
+            },
+            {
+                value = "none",
+                text = "Nothing"
+            },
+            {
+                value = "player",
+                text = "Player"
+            },
+            {
+                value = "lookat",
+                text = "Crosshair"
+            }
+        }, 
+        nil, nil, function(value)
+        end
+    )
+
+    LUI.Options.CreateOptionButton(menu, 
+        "ai_controller_shoot", 
+        "Target entity", 
+        "What the AI should attack.", 
+        {
+            {
+                value = "auto",
+                text = "Automatic"
+            },
+            {
+                value = "enemies",
+                text = "Enemies"
+            },
+            {
+                value = "lookat",
+                text = "Crosshair"
+            }
+        }, 
+        nil, nil, function(value)
+        end
+    )
+
+    backbutton(menu)
+    scrolllist(menu)
+
+    return menu
+end
+
+LUI.MenuBuilder.m_types_build["ai_spawner_controller_menu"] = controllermenu
 LUI.MenuBuilder.m_types_build["ai_spawner_menu"] = mainmenu
