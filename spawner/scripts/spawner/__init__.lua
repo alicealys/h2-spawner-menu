@@ -28,10 +28,10 @@ end, 0)--]]
 --     vehicle:makeusable()
 -- end)
 
-print(pcall(function()
+pcall(function()
     -- Don't delete spawners    
     game:detour("_ID43797", "_ID44261", function() end)
-end))
+end)
 
 -- Change max ai count
 game:setdvar("ai_count", 64)
@@ -291,6 +291,7 @@ player:onnotify("select_ai_spawner", function(spawner, location, team)
         ai.baseaccuracy = 1000
         ai.maxhealth = 1000
         ai.health = 1000
+        ai.custom = true
 
         if (not ai) then
             game:iprintln("Failed to spawn AI")
@@ -349,7 +350,7 @@ player:onnotify("delete_custom_ai", function()
     local count = 0
 
     for i = 1, #ai do
-        if (ai[i].targetname == "custom_ai") then
+        if (ai[i].custom) then
             ai[i]:delete()
             count = count + 1
         end

@@ -1,6 +1,6 @@
-print(require("vehicle"))
-print(require("ai"))
-print(require("weapon"))
+require("vehicle")
+require("ai")
+require("weapon")
 
 local json = require("json")
 
@@ -92,7 +92,7 @@ keybinds[171] = function()
     if (LUI.FlowManager.IsMenuOpenAndVisible(Engine.GetLuiRoot(), "spawner_main_menu")) then
         LUI.FlowManager.RequestLeaveMenu(nil, "spawner_main_menu")
     else
-        game:playsound("h1_ui_menu_accept")
+        Engine.PlaySound("h1_ui_menu_accept")
         LUI.FlowManager.RequestAddMenu(nil, "spawner_main_menu")
     end
 end
@@ -106,7 +106,7 @@ keybinds[172] = function()
     if (LUI.FlowManager.IsMenuOpenAndVisible(Engine.GetLuiRoot(), lastmenu)) then
         LUI.FlowManager.RequestLeaveMenu(nil, lastmenu)
     else
-        game:playsound("h1_ui_menu_accept")
+        Engine.PlaySound("h1_ui_menu_accept")
         LUI.FlowManager.RequestAddMenu(nil, lastmenu)
     end
 end
@@ -125,70 +125,3 @@ game:onnotify("keydown", function(key)
         keybinds[key]()
     end
 end)
-
-function inithud()
-    hud = LUI.UIElement.new()
-    hud:registerAnimationState("default", {
-        bottomAnchor = false,
-        topAnchor = true,
-        leftAnchor = true,
-        top = 200,
-        left = 10,
-    })
-
-    hud:registerAnimationState("off", {
-        alpha = 0
-    })
-
-    hud:registerAnimationState("on", {
-        alpha = 1
-    })
-
-    local blur = LUI.UIImage.new()
-    blur:registerAnimationState("default", {
-        topAnchor = true,
-        leftAnchor = true,
-        height = 55,
-        width = 230,
-        material = luiglobals.RegisterMaterial("white"),
-        alpha = 0.5,
-        red = 0,
-        green = 0,
-        blue = 0
-    })
-
-    hud:animateToState("off")
-    blur:animateToState("default")
-
-    hud:addElement(blur)
-    LUI.roots.UIRoot0:addElement(hud)
-end
-
-function addtext(text, index)
-    if (not hud) then
-        return
-    end
-
-    local height = 15
-    local top = height * index + 5
-
-    local element = LUI.UIText.new()
-    element:setText(text)
-
-    element:registerAnimationState("default", {
-        leftAnchor = true,
-        topAnchor = true,
-        left = 5,
-        width = 100,
-        height = height,
-        top = top
-    })
-
-    element:animateToState("default")
-    hud:addElement(element)
-end
-
-inithud()
-addtext("Press ^1F5^7 to open Spawner menu", 0)
-addtext("Press ^1F6^7 to re-open last menu", 1)
-addtext("Press ^1X^7 to redo last action", 2)
