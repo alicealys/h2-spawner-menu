@@ -1,32 +1,13 @@
 local json = require("json")
 
--- game:detour("_ID43797", "_ID44261", function() end)
-
-local mission_failed_wrapper_hook = nil
-mission_failed_wrapper_hook = game:detour("_ID42407", "_ID23778", function()
+-- mission failed wrapper
+game:detour("_ID42407", "_ID23778", function()
     game:setsaveddvar("hud_missionFailed", 0)
     game:setsaveddvar("hud_showstance", 1)
     game:setsaveddvar("actionSlotsHide", 0)
     game:setsaveddvar("ui_hideCompassTicker", 0)
     game:setsaveddvar("ammoCounterHide", 0)
 end)
-
--- game:detour("_ID42291", "_ID1538", function() end)
-
---[[game:oninterval(function()
-    local ents = game:getentarray("script_model", "classname")
-    for i = 1, #ents do
-        if (string.match(ents[i].model, "training_target_enemy")) then
-            game:radiusdamage(ents[i].origin, 10, 100, 100, player)
-        end
-    end
-end, 0)--]]
-
--- local vehicle_init_hook = nil
--- vehicle_init_hook = game:detour("_ID42413", "_ID40173", function(self_, vehicle)
---     vehicle_init_hook.invoke(self_, vehicle)
---     vehicle:makeusable()
--- end)
 
 pcall(function()
     -- Don't delete spawners    
@@ -259,7 +240,7 @@ player:onnotify("select_vehicle_spawner", function(spawner, location)
     end
 end)
 
-player:onnotify("select_ai_spawner", function(spawner, location, team)
+player:onnotify("select_ai_spawner", function(spawner, location, team, controllable)
     local aiorigin = player.origin
     local aicount = game:getdvarint("ai_count")
     local total = game:getaiarray()
@@ -280,7 +261,10 @@ player:onnotify("select_ai_spawner", function(spawner, location, team)
 
         spawner.origin = aiorigin
         spawner.count = spawner.count + 1
-        spawner.targetname = "custom_ai"
+
+        if (controllable == 1) then
+            spawner.targetname = "custom_ai"
+        end
 
         game:ontimeout(function()
             spawner.origin = origin
@@ -288,17 +272,14 @@ player:onnotify("select_ai_spawner", function(spawner, location, team)
         end, 0)
 
         local ai = spawner:stalingradspawn()
-        ai.baseaccuracy = 1000
-        ai.maxhealth = 1000
-        ai.health = 1000
-        ai.custom = true
-
         if (not ai) then
             game:iprintln("Failed to spawn AI")
             return
         end
 
-        ai:controller()
+        if (controllable == 1) then
+            ai:controller()
+        end
 
         if (team ~= "auto") then
             ai.team = team

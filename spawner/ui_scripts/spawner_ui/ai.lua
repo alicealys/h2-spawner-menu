@@ -3,10 +3,12 @@ local menus = {}
 
 local spawnlocation = "crosshair"
 local targetteam = "auto"
+local controllable = false
 
 function spawnlocationoptions(menu)
     game:setdvar("ai_spawner_location", spawnlocation)
     game:setdvar("ai_spawner_team", targetteam)
+    game:setdvar("ai_spawner_controllable", controllable)
 
     LUI.Options.CreateOptionButton(menu, 
         "ai_spawner_location", 
@@ -55,6 +57,25 @@ function spawnlocationoptions(menu)
         }, 
         nil, nil, function(value)
             targetteam = value
+        end
+    )
+
+    LUI.Options.CreateOptionButton(menu, 
+        "ai_spawner_controllable", 
+        "Controllable", 
+        "Whether the spawned AI should be controllable or behave normally", 
+        {
+            {
+                value = "1",
+                text = "Enabled"
+            },
+            {
+                value = "0",
+                text = "Disabled"
+            }
+        }, 
+        nil, nil, function(value)
+            controllable = value == "1"
         end
     )
 end
@@ -173,7 +194,7 @@ function createmenu(team)
             for k, v in pairs(spawners[team]) do
                 menu:AddButton(v.name, function()
                     lastaction = function()
-                        notify("select_ai_spawner", v.num, spawnlocation, targetteam)
+                        notify("select_ai_spawner", v.num, spawnlocation, targetteam, controllable)
                     end
                     lastaction()
                 end, nil, true, nil, {
