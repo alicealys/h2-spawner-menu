@@ -87,8 +87,7 @@ LUI.MenuBuilder.m_types_build["spawner_main_menu"] = mainmenu
 
 local keybinds = {}
 
--- F5
-keybinds[171] = function()
+keybinds["F5"] = function()
     if (LUI.FlowManager.IsMenuOpenAndVisible(Engine.GetLuiRoot(), "spawner_main_menu")) then
         LUI.FlowManager.RequestLeaveMenu(nil, "spawner_main_menu")
     else
@@ -97,8 +96,7 @@ keybinds[171] = function()
     end
 end
 
--- F6
-keybinds[172] = function()
+keybinds["F6"] = function()
     if (not lastmenu) then
         return
     end
@@ -111,8 +109,7 @@ keybinds[172] = function()
     end
 end
 
--- X
-keybinds[120] = function()
+keybinds["X"] = function()
     if (not lastaction) then
         return
     end
@@ -120,8 +117,15 @@ keybinds[120] = function()
     lastaction()
 end
 
-game:onnotify("keydown", function(key)
-    if (keybinds[key]) then
-        keybinds[key]()
+local keys = {}
+
+LUI.roots.UIRoot0:registerEventHandler("keydown", function(element, event)
+    if (keybinds[event.key] and not keys[event.key]) then
+        keys[event.key] = true
+        keybinds[event.key]()
     end
+end)
+
+LUI.roots.UIRoot0:registerEventHandler("keyup", function(element, event)
+    keys[event.key] = false
 end)
