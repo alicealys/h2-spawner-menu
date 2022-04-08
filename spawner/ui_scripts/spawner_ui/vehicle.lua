@@ -23,24 +23,30 @@ function mainmenu(a1)
 
     local spawners = json.decode(spawners_json)
 
-    game:setdvar("weapon_spawner_dummy_var", spawnlocation)
-
     createdivider(menu, "Settings")
 
-    local options = {
+    Engine.SetDvarFromString("vehicle_spawner_location", spawnlocation)
+    LUI.Options.CreateOptionButton(
+        menu, 
+        "vehicle_spawner_location", 
+        "Spawn location", 
+        "Where to spawn the vehicle", 
         {
-            value = "crosshair",
-            text = "Crosshair"
-        },
-        {
-            value = "player",
-            text = "Player location"
-        }
-    }
-
-    LUI.Options.CreateOptionButton(menu, "weapon_spawner_dummy_var", "Spawn location", "Where to spawn the vehicle", options, nil, nil, function(value)
-        spawnlocation = value
-    end)
+            {
+                value = "crosshair",
+                text = "Crosshair"
+            },
+            {
+                value = "player",
+                text = "Player location"
+            }
+        }, 
+        nil, 
+        nil, 
+        function(value)
+            spawnlocation = value
+        end
+    )
 
     menu:AddButton("Delete all vehicles", function()
         lastaction = function()

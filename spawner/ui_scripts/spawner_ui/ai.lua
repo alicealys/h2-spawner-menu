@@ -6,9 +6,9 @@ local targetteam = "auto"
 local controllable = false
 
 function spawnlocationoptions(menu)
-    game:setdvar("ai_spawner_location", spawnlocation)
-    game:setdvar("ai_spawner_team", targetteam)
-    game:setdvar("ai_spawner_controllable", controllable)
+    Engine.SetDvarFromString("ai_spawner_location", spawnlocation)
+    Engine.SetDvarFromString("ai_spawner_team", targetteam)
+    Engine.SetDvarFromString("ai_spawner_controllable", controllable and "1" or "0")
 
     LUI.Options.CreateOptionButton(menu, 
         "ai_spawner_location", 

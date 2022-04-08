@@ -1,25 +1,74 @@
 local json = require("json")
 
+function gamename()
+    if (gamename_) then
+        return gamename_
+    end
+
+    gamename_ = nil
+    local version = game:getdvar("version")
+
+    if (version:match("H1")) then
+        gamename_ = "h1"
+    end
+
+    if (version:match("H2")) then
+        gamename_ = "h2"
+    end
+
+    return gamename_
+end
+
+if (not gamename()) then
+    print("[Entity Spawner] Unsupported game")
+    return
+end
+
+function select(h1, h2)
+    if (gamename() == "h1") then
+        return h1
+    end
+
+    if (gamename() == "h2") then
+        return h2
+    end
+end
+
+local files = {
+    ["maps/_spawner"] = {
+        _id = "_ID" .. select(42369, 42372),
+        spawn_think = "_ID" .. select(35173, 35176)
+    },
+    ["maps/_utility"] = {
+        _id = "_ID" .. select(42294, 42407),
+        mission_failed_wrapper = "_ID" .. select(23773, 23778)
+    }
+}
+
 -- mission failed wrapper
-game:detour("_ID42407", "_ID23778", function()
-    game:setsaveddvar("hud_missionFailed", 0)
-    game:setsaveddvar("hud_showstance", 1)
-    game:setsaveddvar("actionSlotsHide", 0)
-    game:setsaveddvar("ui_hideCompassTicker", 0)
-    game:setsaveddvar("ammoCounterHide", 0)
+game:detour(files["maps/_utility"]._id, files["maps/_utility"].mission_failed_wrapper, function()
+    if (game:getdvar("gamename") == "H2") then
+        game:setsaveddvar("hud_missionFailed", 0)
+        game:setsaveddvar("hud_showstance", 1)
+        game:setsaveddvar("actionSlotsHide", 0)
+        game:setsaveddvar("ui_hideCompassTicker", 0)
+        game:setsaveddvar("ammoCounterHide", 0)
+    end
 end)
 
-pcall(function()
-    -- Don't delete spawners    
-    game:detour("_ID43797", "_ID44261", function() end)
-end)
+if (game:getdvar("gamename") == "H2") then
+    pcall(function()
+        -- Don't delete spawners
+        game:detour("_ID43797", "_ID44261", function() end)
+    end)
+end
 
 -- Change max ai count
-game:setdvar("ai_count", 64)
+game:executecommand("set ai_count 64")
 
 -- maps/spawner::spawn_think
 local spawnthinkhook = nil
-spawnthinkhook = game:detour("_ID42372", "_ID35176", function(guy, targetname)
+spawnthinkhook = game:detour(files["maps/_spawner"]._id, files["maps/_spawner"].spawn_think, function(guy, targetname)
     if (targetname == "custom_ai") then
         return
     end
@@ -42,7 +91,7 @@ function cleanvehiclename(name)
         ["laatpv"] = "humvee"
     }
 
-    name = name:gsub("vehicle", ""):gsub("h2", ""):gsub("_", " ")
+    name = name:gsub("vehicle", ""):gsub("h2", ""):gsub("h1", ""):gsub("_", " ")
     local split = name:split()
     local cleanname = ""
 
@@ -227,16 +276,16 @@ player:onnotify("select_vehicle_spawner", function(spawner, location)
         vehicleorigin = getlookat()
     end
 
-    local spawner = game:getentbynum(spawner)
+    local spawner = game:getentbynum(tonumber(spawner))
     if (game:isspawner(spawner) == 1) then
         local origin = spawner.origin
         spawner.origin = vehicleorigin
         local vehicle = spawner:vehicle_dospawn()
-        vehicle:makeusable()
         vehicle.maxhealth = 100000
         vehicle.health = 100000
         vehicle:vehicle_turnengineon()
         spawner.origin = origin
+        vehicle:makeusable()
     end
 end)
 
@@ -254,7 +303,7 @@ player:onnotify("select_ai_spawner", function(spawner, location, team, controlla
         aiorigin = getlookat()
     end
 
-    local spawner = game:getentbynum(spawner)
+    local spawner = game:getentbynum(tonumber(spawner))
     if (game:isspawner(spawner) == 1) then
         local origin = spawner.origin
         local targetname = spawner.targetname
@@ -262,7 +311,7 @@ player:onnotify("select_ai_spawner", function(spawner, location, team, controlla
         spawner.origin = aiorigin
         spawner.count = spawner.count + 1
 
-        if (controllable == 1) then
+        if (controllable == "true") then
             spawner.targetname = "custom_ai"
         end
 
@@ -277,6 +326,7 @@ player:onnotify("select_ai_spawner", function(spawner, location, team, controlla
             return
         end
 
+        ai.custom = true
         if (controllable == 1) then
             ai:controller()
         end

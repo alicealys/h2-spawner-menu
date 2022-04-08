@@ -17,8 +17,8 @@ function mainmenu(a1)
 
     LUI.MenuTemplate.InitInGameBkg = InitInGameBkg
 
-    game:setdvar("weapon_spawner_location", spawnlocation)
-    game:setdvar("weapon_spawner_action", action)
+    Engine.SetDvarFromString("weapon_spawner_location", spawnlocation)
+    Engine.SetDvarFromString("weapon_spawner_action", action)
 
     createdivider(menu, "Settings")
 
