@@ -1,4 +1,3 @@
-local json = require("json")
 local menus = {}
 
 local spawnlocation = "crosshair"

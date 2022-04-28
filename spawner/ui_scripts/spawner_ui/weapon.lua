@@ -1,5 +1,3 @@
-local json = require("json")
-
 local spawnlocation = "crosshair"
 local action = "give"
 

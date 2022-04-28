@@ -2,8 +2,6 @@ require("vehicle")
 require("ai")
 require("weapon")
 
-local json = require("json")
-
 lastmenu = nil
 function openmenu(menu)
     lastmenu = menu
