@@ -327,7 +327,7 @@ player:onnotify("select_ai_spawner", function(spawner, location, team, controlla
         end
 
         ai.custom = true
-        if (controllable == 1) then
+        if (controllable == "true") then
             ai:controller()
         end
 
